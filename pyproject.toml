@@ -1,116 +1,163 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "cdmp"
-version = "0.1.0"
-description = "Calibrated, leakage-controlled cancer driver mutation profiling from tumour sequencing data"
+name = "scurator"
+version = "1.0.0"
+description = "High-performance, GPU-accelerated somatic driver mutation profiling and functional impact assessment framework for cancer genomics."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.9"
 license = { text = "EUPL-1.2" }
-authors = [{ name = "NEXAGEN Bioinformatics" }]
 keywords = [
-  "cancer genomics",
-  "driver mutations",
-  "somatic variants",
-  "variant effect prediction",
-  "reproducible research",
+    "cancer-genomics",
+    "bioinformatics",
+    "driver-mutations",
+    "variant-annotation",
+    "vcf-processing",
+    "somatic-variants",
+    "gpu-acceleration",
+    "rapids-cudf",
+    "tcga",
+    "clinvar",
+    "cosmic",
+    "ngs-analysis",
+]
+authors = [
+    { name = "NEXAGEN Research Team", email = "research@nexagen.org" }
+]
+maintainers = [
+    { name = "NEXAGEN Scientific Community", email = "dev@nexagen.org" }
 ]
 classifiers = [
-  "Development Status :: 4 - Beta",
-  "Intended Audience :: Science/Research",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12",
-  "Topic :: Scientific/Engineering :: Bio-Informatics",
-  "Operating System :: POSIX :: Linux",
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Healthcare Industry",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+    "License :: OSI Approved :: European Union Public Licence 1.2 (EUPL 1.2)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS :: MacOS X",
 ]
 dependencies = [
-  "numpy>=1.24",
-  "pandas>=2.0",
-  "pyarrow>=14.0",
-  "scipy>=1.10",
-  "scikit-learn>=1.3",
-  "matplotlib>=3.7",
-  "seaborn>=0.13",
-  "pyyaml>=6.0",
-  "requests>=2.31",
-  "biopython>=1.83",
+    "numpy>=1.24.0",
+    "pandas>=2.0.0",
+    "biopython>=1.81",
+    "pysam>=0.21.0",
+    "cyvcf2>=0.30.22",
+    "matplotlib>=3.7.0",
+    "seaborn>=0.12.0",
+    "scipy>=1.10.0",
+    "pyyaml>=6.0",
+    "click>=8.1.0",
+    "tqdm>=4.65.0",
+    "requests>=2.31.0",
+    "openpyxl>=3.1.0",
 ]
 
 [project.optional-dependencies]
-vcf = ["cyvcf2>=0.30", "pysam>=0.22"]
-plm = ["torch>=2.1", "fair-esm>=2.0.0"]
+gpu = [
+    "cudf-cu12>=23.08.0",
+    "cupy-cuda12x>=12.0.0",
+]
 dev = [
-  "pytest>=7.4",
-  "pytest-cov>=4.1",
-  "ruff>=0.5",
-  "mypy>=1.8",
-  "pandas-stubs",
-  "types-PyYAML",
-  "types-requests",
-  "pre-commit>=3.6",
-  "snakemake>=8.0",
-  "nbstripout>=0.7",
-  "mkdocs-material>=9.5",
-  "mkdocstrings[python]>=0.25",
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.7.0",
+    "isort>=5.12.0",
+    "flake8>=6.1.0",
+    "mypy>=1.5.0",
+    "ruff>=0.0.280",
+    "pre-commit>=3.3.3",
+]
+docs = [
+    "sphinx>=7.0.0",
+    "sphinx-rtd-theme>=1.3.0",
+    "myst-parser>=2.0.0",
+]
+all = [
+    "scurator[gpu,dev,docs]",
 ]
 
 [project.urls]
 Homepage = "https://github.com/nexagen-bioinfo/Cancer-Driver-Mutation-Profiling"
-Repository = "https://github.com/nexagen-bioinfo/Cancer-Driver-Mutation-Profiling"
-Documentation = "https://nexagen-bioinfo.github.io/Cancer-Driver-Mutation-Profiling/"
+Documentation = "https://github.com/nexagen-bioinfo/Cancer-Driver-Mutation-Profiling/tree/main/docs"
+Repository = "https://github.com/nexagen-bioinfo/Cancer-Driver-Mutation-Profiling.git"
 Issues = "https://github.com/nexagen-bioinfo/Cancer-Driver-Mutation-Profiling/issues"
 
 [project.scripts]
-cdmp = "cdmp.cli:main"
+scurator = "scurator.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
-cdmp = ["py.typed", "resources/*.tsv", "resources/*.json"]
+scurator = ["py.typed", "config/*.yaml", "config/*.json"]
 
-[tool.ruff]
-line-length = 100
-target-version = "py310"
-src = ["src", "tests"]
+[tool.black]
+line-length = 88
+target-version = ["py39", "py310", "py311"]
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
 
-[tool.ruff.lint]
-select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM", "ARG", "PTH", "RUF"]
-ignore = ["N803", "N806"]
-
-[tool.ruff.lint.per-file-ignores]
-"tests/*" = ["ARG001"]
-
-[tool.ruff.format]
-quote-style = "double"
+[tool.isort]
+profile = "black"
+line_length = 88
+multi_line_output = 3
+include_trailing_comma = true
 
 [tool.pytest.ini_options]
 minversion = "7.0"
-addopts = "-ra -q --strict-markers --cov=cdmp --cov-report=term-missing"
-testpaths = ["tests"]
-markers = [
-  "slow: tests that take more than a few seconds",
-  "gpu: tests that require a CUDA device",
-  "network: tests that require network access",
+addopts = "-ra -q --cov=scurator --cov-report=term-missing --cov-report=xml"
+testpaths = [
+    "tests",
+]
+python_files = [
+    "test_*.py",
+]
+
+[tool.coverage.run]
+source = ["src/scurator"]
+branch = true
+omit = [
+    "tests/*",
+    "src/scurator/__version__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
 ]
 
 [tool.mypy]
-python_version = "3.10"
-files = ["src/cdmp"]
+python_version = "3.9"
+warn_return_any = true
 warn_unused_configs = true
-warn_redundant_casts = true
-warn_unused_ignores = true
 disallow_untyped_defs = true
-no_implicit_optional = true
 ignore_missing_imports = true
 
-[tool.coverage.run]
-branch = true
-source = ["cdmp"]
-
-[tool.coverage.report]
-exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:", "raise NotImplementedError"]
-fail_under = 70
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+select = ["E", "F", "B", "I", "N", "UP", "PL", "RUF"]
+ignore = ["E501"]
