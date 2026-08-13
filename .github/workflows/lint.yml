@@ -1,0 +1,94 @@
+# ==============================================================================
+# SCURATOR: Somatic Driver Mutation Profiling Framework
+# Static Linting and Security Audit Workflow (.github/workflows/lint.yml)
+#
+# Standards Compliance:
+# * European Open Science Cloud (EOSC) FAIR Principles (Findable, Accessible, Interoperable, Reusable)
+# * Google Open Source Software (OSS) Engineering Practice Standards
+# * European Union Public Licence v1.2 (EUPL-1.2)
+# ==============================================================================
+
+name: Linting and Security Analysis
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+concurrency:
+  group: ${{ github.workflow }}-lint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python-linting:
+    name: Flake8 and Code Quality Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"
+
+      - name: Install Linting Tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 flake8-bugbear flake8-docstrings flake8-comprehensions
+
+      - name: Run Flake8 Code Analysis
+        run: |
+          # Stop the build if there are Python syntax errors or undefined names
+          flake8 src tests --count --select=E9,F63,F7,F82 --show-source --statistics
+          # Enforce complexity and code quality standards
+          flake8 src tests --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
+
+  security-scan:
+    name: Security Vulnerability and AST Audit (Bandit)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"
+
+      - name: Install Security Tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install bandit pip-audit
+
+      - name: Run Bandit Security Scan
+        run: |
+          bandit -r src/scurator -ll
+
+      - name: Run Pip Audit Dependency Vulnerability Check
+        run: |
+          pip-audit --desc
+
+  yaml-and-configuration-lint:
+    name: Configuration File Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"
+
+      - name: Install Yamllint
+        run: |
+          python -m pip install yamllint
+
+      - name: Validate YAML Configuration Files
+        run: |
+          yamllint .
