@@ -178,7 +178,7 @@ Normal mutational spectrum ratios for human somatic exomes typically range betwe
 | LAYER 2: PIPELINE & HARDWARE ACCELERATION (`src/scurator/pipeline/` & `utils/`)   |
 | * filter.py           : Missense, Frameshift, Nonsense variant isolator           |
 | * annotator.py        : ClinVar and COSMIC coordinate cross-referencing           |
-| * driver_finder.py    : Target pan-cancer gene hotspot extractor                   |
+| * driver_finder.py    : Target pan-cancer gene hotspot extractor                  |
 | * impact_scorer.py    : Composite mathematical damage score computation           |
 | * gpu_accelerator.py  : RAPIDS cuDF GPU memory buffer and CUDA kernel bridge      |
 +-----------------------------------------------------------------------------------+
@@ -186,7 +186,7 @@ Normal mutational spectrum ratios for human somatic exomes typically range betwe
                                           v
 +-----------------------------------------------------------------------------------+
 | LAYER 3: VISUALIZATION & REPORTING (`src/scurator/visualization/`)                |
-| * oncoplot.py         : OncoPrint-style mutation heatmaps (Matplotlib/Seaborn)     |
+| * oncoplot.py         : OncoPrint-style mutation heatmaps (Matplotlib/Seaborn)    |
 | * plots.py            : Base transition/transversion spectrum plots               |
 | * report_generator.py : Tabular CSV, Excel, and Markdown summary generator        |
 +-----------------------------------------------------------------------------------+
