@@ -1,13 +1,5 @@
 # Scurator: Somatic Driver Mutation Profiling Framework
 
-[![License: EUPL v1.2](https://img.shields.io/badge/License-EUPL%20v1.2-blue.svg)](https://joinup.ec.europa.eu/software/page/eupl)
-[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.10849201-blue.svg)](https://doi.org/10.5281/zenodo.10849201)
-[![Python Version](https://img.shields.io/badge/Python-3.10%20%7C%203.11-brightgreen.svg)](https://www.python.org/)
-[![CUDA Acceleration](https://img.shields.io/badge/NVIDIA%20CUDA-11.8%20%7C%2012.x-green.svg)](https://developer.nvidia.com/cuda-toolkit)
-[![Build Status](https://github.com/nexagen-bioinfo/Cancer-Driver-Mutation-Profiling/actions/workflows/ci.yml/badge.svg)](https://github.com/nexagen-bioinfo/Cancer-Driver-Mutation-Profiling/actions/workflows/ci.yml)
-[![Coverage Status](https://img.shields.io/badge/Coverage-94.8%25-success.svg)](https://github.com/nexagen-bioinfo/Cancer-Driver-Mutation-Profiling)
-[![FAIR Principles](https://img.shields.io/badge/EOSC-FAIR%20Compliant-purple.svg)](https://eosc-portal.eu/)
-
 **Scurator** is an open-source, high-performance, GPU-accelerated bioinformatics framework engineered for automated identification, functional impact scoring, and publication-ready visualization of somatic cancer driver mutations from Next-Generation Sequencing (NGS) Variant Call Format (VCF) datasets.
 
 Developed under the NEXAGEN Scientific Research Initiative, Scurator adheres strictly to European Open Science Cloud (EOSC) FAIR data principles (Findable, Accessible, Interoperable, Reusable), Google Open Source Software (OSS) engineering standards, and the European Union Public Licence v1.2 (EUPL-1.2).
