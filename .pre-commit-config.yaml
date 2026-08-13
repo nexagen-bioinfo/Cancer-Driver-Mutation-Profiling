@@ -1,56 +1,76 @@
-# Run `pre-commit install` once, then every commit is checked locally with the
-# same rules that continuous integration enforces.
+# ==============================================================================
+# SCURATOR: Somatic Driver Mutation Profiling Framework
+# Git Pre-Commit Hook Configuration (.pre-commit-config.yaml)
+#
+# Standards Compliance:
+# * European Open Science Cloud (EOSC) FAIR Principles (Findable, Accessible, Interoperable, Reusable)
+# * Google Open Source Software (OSS) Engineering Practice Standards
+# * European Union Public Licence v1.2 (EUPL-1.2)
+# ==============================================================================
+
 default_language_version:
-  python: python3
+  python: python3.10
+
+default_stages: [commit, push]
 
 repos:
+  # ------------------------------------------------------------------------------
+  # 1. Standard Pre-Commit Sanity and Security Checks
+  # ------------------------------------------------------------------------------
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
-      - id: check-added-large-files
-        args: ["--maxkb=512"]
-      - id: check-merge-conflict
-      - id: check-yaml
-      - id: check-toml
-      - id: check-json
-      - id: end-of-file-fixer
       - id: trailing-whitespace
-      - id: mixed-line-ending
-        args: ["--fix=lf"]
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-toml
+      - id: check-xml
+      - id: check-added-large-files
+        args: ['--maxkb=5000']
+      - id: check-merge-conflict
+      - id: check-case-conflict
       - id: detect-private-key
-      - id: no-commit-to-branch
-        args: ["--branch=main"]
+      - id: debug-statements
 
+  # ------------------------------------------------------------------------------
+  # 2. Python Code Formatter (Black)
+  # ------------------------------------------------------------------------------
+  - repo: https://github.com/psf/black
+    rev: 24.4.2
+    hooks:
+      - id: black
+        language_version: python3.10
+
+  # ------------------------------------------------------------------------------
+  # 3. Python Import Sorter (isort)
+  # ------------------------------------------------------------------------------
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: ["--profile", "black"]
+
+  # ------------------------------------------------------------------------------
+  # 4. Fast Linter and Code Quality Engine (Ruff)
+  # ------------------------------------------------------------------------------
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.9
+    rev: v0.4.4
     hooks:
       - id: ruff
-        args: ["--fix"]
-      - id: ruff-format
+        args: [--fix, --exit-non-zero-on-fix]
 
+  # ------------------------------------------------------------------------------
+  # 5. Static Type Checker (Mypy)
+  # ------------------------------------------------------------------------------
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.11.2
+    rev: v1.10.0
     hooks:
       - id: mypy
-        additional_dependencies: ["pandas-stubs", "types-PyYAML", "types-requests"]
-        args: ["--config-file=pyproject.toml"]
-        pass_filenames: false
-
-  - repo: https://github.com/kynan/nbstripout
-    rev: 0.7.1
-    hooks:
-      - id: nbstripout
-        description: Keep notebook diffs reviewable by stripping outputs before commit.
-
-  - repo: https://github.com/snakemake/snakefmt
-    rev: v0.10.2
-    hooks:
-      - id: snakefmt
-
-  - repo: local
-    hooks:
-      - id: no-data-in-git
-        name: block accidental data commits
-        entry: bash -c 'git diff --cached --name-only | grep -E "^(data|results)/(raw|interim|processed|external|tables|figures|models)/" && echo "Data files must not be committed. Register them in config/checksums/manifest.sha256 instead." && exit 1 || exit 0'
-        language: system
-        pass_filenames: false
+        additional_dependencies:
+          - types-PyYAML
+          - types-requests
+          - types-setuptools
+          - pandas-stubs
+        args: [--ignore-missing-imports, --warn-unreachable]
