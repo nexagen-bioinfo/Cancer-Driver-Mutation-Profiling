@@ -1,0 +1,73 @@
+# ==============================================================================
+# SCURATOR: Somatic Driver Mutation Profiling Framework
+# Security Analysis and CodeQL Vulnerability Scanning (.github/workflows/security.yml)
+#
+# Standards Compliance:
+# * European Open Science Cloud (EOSC) FAIR Principles (Findable, Accessible, Interoperable, Reusable)
+# * Google Open Source Software (OSS) Security Engineering Standards
+# * European Union Public Licence v1.2 (EUPL-1.2)
+# ==============================================================================
+
+name: CodeQL and Security Analysis
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+  schedule:
+    - cron: '0 6 * * 1'
+
+concurrency:
+  group: ${{ github.workflow }}-security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  codeql-analysis:
+    name: GitHub CodeQL Security Scan
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL Analysis
+        uses: github/codeql-action/init@v3
+        with:
+          languages: python
+          queries: security-extended,security-and-quality
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:python"
+
+  trivy-vulnerability-scan:
+    name: Repository Dependency and Secret Scan (Trivy)
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Run Trivy Security Scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          ignore-unfixed: true
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy Scan Results to GitHub Security Tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
