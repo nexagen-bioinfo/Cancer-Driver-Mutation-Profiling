@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Snakemake
+.snakemake/
+
+# Data and results are never committed. Provenance is committed instead.
+data/raw/**
+data/interim/**
+data/processed/**
+data/external/**
+!data/**/.gitkeep
+!data/**/README.md
+results/**
+!results/**/.gitkeep
+
+# Large model weights and caches
+*.pt
+*.pth
+*.safetensors
+.cache/
+torch_hub/
+
+# Editors and OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Secrets
+.env
+*.token
+synapse_config*
