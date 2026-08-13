@@ -1,5 +1,15 @@
+# ==============================================================================
+# SCURATOR: Somatic Driver Mutation Profiling Framework
+# Python Project Specification File (PEP 517 / PEP 518 / PEP 621)
+#
+# Standards Compliance:
+# * European Open Science Cloud (EOSC) FAIR Principles (Findable, Accessible, Interoperable, Reusable)
+# * Google Open Source Software (OSS) Engineering Practice Standards
+# * European Union Public Licence v1.2 (EUPL-1.2)
+# ==============================================================================
+
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = ["setuptools>=61.0.0", "wheel>=0.41.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,7 +17,7 @@ name = "scurator"
 version = "1.0.0"
 description = "High-performance, GPU-accelerated somatic driver mutation profiling and functional impact assessment framework for cancer genomics."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = { text = "EUPL-1.2" }
 keywords = [
     "cancer-genomics",
@@ -37,7 +47,6 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Medical Science Apps.",
     "License :: OSI Approved :: European Union Public Licence 1.2 (EUPL 1.2)",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Operating System :: POSIX :: Linux",
@@ -57,12 +66,13 @@ dependencies = [
     "tqdm>=4.65.0",
     "requests>=2.31.0",
     "openpyxl>=3.1.0",
+    "pillow>=10.0.0",
 ]
 
 [project.optional-dependencies]
 gpu = [
-    "cudf-cu12>=23.08.0",
-    "cupy-cuda12x>=12.0.0",
+    "cudf-cu11>=23.08.0; platform_system == 'Linux'",
+    "cupy-cuda11x>=12.0.0; platform_system == 'Linux'",
 ]
 dev = [
     "pytest>=7.4.0",
@@ -100,7 +110,7 @@ scurator = ["py.typed", "config/*.yaml", "config/*.json"]
 
 [tool.black]
 line-length = 88
-target-version = ["py39", "py310", "py311"]
+target-version = ["py310", "py311"]
 include = '\.pyi?$'
 exclude = '''
 /(
@@ -150,7 +160,7 @@ exclude_lines = [
 ]
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.10"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
@@ -158,6 +168,6 @@ ignore_missing_imports = true
 
 [tool.ruff]
 line-length = 88
-target-version = "py39"
+target-version = "py310"
 select = ["E", "F", "B", "I", "N", "UP", "PL", "RUF"]
 ignore = ["E501"]
