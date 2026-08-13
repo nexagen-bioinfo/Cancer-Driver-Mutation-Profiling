@@ -1,49 +1,135 @@
-# Python
+# ==============================================================================
+# SCURATOR: Somatic Driver Mutation Profiling Framework
+# Version Control Exclusion Specification (.gitignore)
+#
+# Standards Compliance:
+# * European Open Science Cloud (EOSC) FAIR Principles (Findable, Accessible, Interoperable, Reusable)
+# * Google Open Source Software (OSS) Engineering Practice Standards
+# * European Union Public Licence v1.2 (EUPL-1.2)
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Byte-compiled / Optimized / Native C-Extension Modules
+# ------------------------------------------------------------------------------
 __pycache__/
 *.py[cod]
+*$py.class
+*.so
+*.o
+*.a
+*.dylib
+*.dll
+
+# ------------------------------------------------------------------------------
+# 2. Python Distribution, Packaging, and Build Artifacts
+# ------------------------------------------------------------------------------
+build/
+bdist/
+dist/
+sdist/
+wheels/
+share/python-wheels/
 *.egg-info/
 .eggs/
-build/
-dist/
+MANIFEST
+
+# ------------------------------------------------------------------------------
+# 3. Virtual Environments and Conda Runtime Exports
+# ------------------------------------------------------------------------------
 .venv/
 venv/
-.mypy_cache/
-.ruff_cache/
+ENV/
+env/
+.conda/
+.env
+
+# ------------------------------------------------------------------------------
+# 4. Large-Scale Genomics Data Files (FAIR Compliance Protection)
+# Exclude raw NGS datasets, sequence reads, alignments, and heavy variants
+# ------------------------------------------------------------------------------
+data/raw/*
+data/processed/*
+data/external/*
+
+# Allow gitkeep and documentation files to preserve directory structure
+!data/raw/.gitkeep
+!data/raw/README.md
+!data/processed/.gitkeep
+!data/processed/README.md
+!data/external/.gitkeep
+!data/external/README.md
+
+# Genomics File Extension Exclusion Rules
+*.vcf
+*.vcf.gz
+*.vcf.gz.tbi
+*.vcf.idx
+*.fastq
+*.fastq.gz
+*.fq
+*.fq.gz
+*.bam
+*.bai
+*.cram
+*.crai
+*.sam
+*.maf
+*.maf.gz
+*.bed
+*.bw
+*.bigWig
+*.fasta
+*.fasta.fai
+*.fa
+*.fa.fai
+
+# Exception: Allow synthetic test VCF fixtures required for GitHub Actions CI
+!data/test_fixtures/
+!data/test_fixtures/*
+
+# ------------------------------------------------------------------------------
+# 5. Snakemake Workflow Engine and Pipeline Caches
+# ------------------------------------------------------------------------------
+.snakemake/
+.pipeline/
+
+# ------------------------------------------------------------------------------
+# 6. Jupyter Notebook Checkpoints and Export Artifacts
+# ------------------------------------------------------------------------------
+.ipynb_checkpoints
+*-checkpoint.ipynb
+*.nbconvert.ipynb
+
+# ------------------------------------------------------------------------------
+# 7. Testing, Coverage, and Code Quality Static Analysis Cache
+# ------------------------------------------------------------------------------
 .pytest_cache/
 .coverage
+.coverage.*
 coverage.xml
 htmlcov/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.hypothesis/
 
-# Jupyter
-.ipynb_checkpoints/
-
-# Snakemake
-.snakemake/
-
-# Data and results are never committed. Provenance is committed instead.
-data/raw/**
-data/interim/**
-data/processed/**
-data/external/**
-!data/**/.gitkeep
-!data/**/README.md
-results/**
-!results/**/.gitkeep
-
-# Large model weights and caches
-*.pt
-*.pth
-*.safetensors
-.cache/
-torch_hub/
-
-# Editors and OS
-.DS_Store
-.idea/
+# ------------------------------------------------------------------------------
+# 8. Integrated Development Environments (IDE) and System Files
+# ------------------------------------------------------------------------------
 .vscode/
+.idea/
 *.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+ehthumbs.db
 
-# Secrets
-.env
-*.token
-synapse_config*
+# ------------------------------------------------------------------------------
+# 9. Application Logging and Temporary Execution Output
+# ------------------------------------------------------------------------------
+*.log
+logs/
+*.tmp
+*.temp
