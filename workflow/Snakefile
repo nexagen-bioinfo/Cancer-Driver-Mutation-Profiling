@@ -1,0 +1,156 @@
+# ==============================================================================
+# SCURATOR: Somatic Driver Mutation Profiling Framework
+# Snakemake Reproducible Workflow Engine Specification (workflow/Snakefile)
+#
+# Standards Compliance:
+# * European Open Science Cloud (EOSC) FAIR Principles (Findable, Accessible, Interoperable, Reusable)
+# * Google Open Source Software (OSS) Engineering Practice Standards
+# * European Union Public Licence v1.2 (EUPL-1.2)
+# ==============================================================================
+
+import os
+from pathlib import Path
+
+# Load pipeline configuration parameters
+configfile: "config/default_config.yaml"
+
+# Define sample wildcards from raw data directory
+RAW_DATA_DIR = Path("data/raw")
+SAMPLES, = glob_wildcards(str(RAW_DATA_DIR / "{sample}.vcf.gz"))
+
+# Fallback default samples if raw data directory is empty
+if not SAMPLES:
+    SAMPLES = ["sample_tumor", "TCGA_BRCA_01"]
+
+rule all:
+    input:
+        expand("data/processed/qc/{sample}_qc.json", sample=SAMPLES),
+        expand("data/processed/filtered/{sample}_filtered.csv", sample=SAMPLES),
+        expand("data/processed/scored/{sample}_scored.csv", sample=SAMPLES),
+        expand("docs/figures/{sample}_oncoplot.png", sample=SAMPLES),
+        expand("docs/figures/{sample}_spectrum.png", sample=SAMPLES),
+        "docs/TECHNICAL_REPORT.md"
+
+rule quality_control:
+    """Role 1: Data Engineering and Quality Control (DP >= 10, QUAL >= 30, VAF >= 0.05)."""
+    input:
+        vcf = "data/raw/{sample}.vcf.gz"
+    output:
+        report = "data/processed/qc/{sample}_qc.json"
+    log:
+        "logs/qc/{sample}.log"
+    benchmark:
+        "logs/benchmarks/qc_{sample}.tsv"
+    params:
+        min_depth = config["quality_control"]["min_read_depth"],
+        min_qual = config["quality_control"]["min_qual_score"],
+        min_vaf = config["quality_control"]["min_variant_allele_frequency"]
+    threads: 4
+    shell:
+        """
+        scurator qc \
+            --input {input.vcf} \
+            --output-report {output.report} \
+            --min-depth {params.min_depth} \
+            --min-qual {params.min_qual} \
+            --min-vaf {params.min_vaf} > {log} 2>&1
+        """
+
+rule variant_filtering:
+    """Role 2: Somatic Missense and Frameshift Variant Filtering."""
+    input:
+        vcf = "data/raw/{sample}.vcf.gz",
+        qc_report = "data/processed/qc/{sample}_qc.json"
+    output:
+        filtered_csv = "data/processed/filtered/{sample}_filtered.csv"
+    log:
+        "logs/filtering/{sample}.log"
+    benchmark:
+        "logs/benchmarks/filtering_{sample}.tsv"
+    params:
+        genes = "config/driver_genes.json",
+        gpu_flag = "--enable-gpu" if config["pipeline"]["enable_gpu"] else ""
+    threads: 16
+    shell:
+        """
+        scurator run \
+            --input {input.vcf} \
+            --output-dir data/processed/filtered/ \
+            --min-depth {config[quality_control][min_read_depth]} \
+            --min-vaf {config[quality_control][min_variant_allele_frequency]} \
+            {params.gpu_flag} > {log} 2>&1
+        """
+
+rule clinvar_annotation_and_scoring:
+    """Role 2: ClinVar Pathogenicity Mapping and Composite Damage Index Calculation."""
+    input:
+        filtered_csv = "data/processed/filtered/{sample}_filtered.csv",
+        clinvar_db = "data/external/clinvar.vcf.gz"
+    output:
+        scored_csv = "data/processed/scored/{sample}_scored.csv"
+    log:
+        "logs/scoring/{sample}.log"
+    benchmark:
+        "logs/benchmarks/scoring_{sample}.tsv"
+    threads: 8
+    shell:
+        """
+        python -m scurator.pipeline.annotator \
+            --input {input.filtered_csv} \
+            --clinvar-db {input.clinvar_db} \
+            --output {output.scored_csv} > {log} 2>&1
+        """
+
+rule generate_oncoplot:
+    """Role 3: Publication-Grade 300 DPI OncoPrint Matrix Visualizer."""
+    input:
+        scored_csv = "data/processed/scored/{sample}_scored.csv"
+    output:
+        oncoplot_png = "docs/figures/{sample}_oncoplot.png"
+    log:
+        "logs/visualization/oncoplot_{sample}.log"
+    params:
+        dpi = config["visualization"]["figure_dpi"]
+    threads: 2
+    shell:
+        """
+        scurator visualize \
+            --input {input.scored_csv} \
+            --output-dir docs/figures/ \
+            --dpi {params.dpi} \
+            --format png > {log} 2>&1
+        """
+
+rule generate_mutational_spectrum:
+    """Role 3: Base Transition and Transversion Spectrum Plotter."""
+    input:
+        scored_csv = "data/processed/scored/{sample}_scored.csv"
+    output:
+        spectrum_png = "docs/figures/{sample}_spectrum.png"
+    log:
+        "logs/visualization/spectrum_{sample}.log"
+    params:
+        dpi = config["visualization"]["figure_dpi"]
+    threads: 2
+    shell:
+        """
+        python -m scurator.visualization.plots \
+            --input {input.scored_csv} \
+            --output {output.spectrum_png} \
+            --dpi {params.dpi} > {log} 2>&1
+        """
+
+rule compile_technical_report:
+    """Role 3: NEXAGEN Technical Report Compiler."""
+    input:
+        scored_csvs = expand("data/processed/scored/{sample}_scored.csv", sample=SAMPLES),
+        qc_reports = expand("data/processed/qc/{sample}_qc.json", sample=SAMPLES)
+    output:
+        report_md = "docs/TECHNICAL_REPORT.md"
+    log:
+        "logs/report/compile.log"
+    shell:
+        """
+        python -m scurator.visualization.report_generator \
+            --output {output.report_md} > {log} 2>&1
+        """
