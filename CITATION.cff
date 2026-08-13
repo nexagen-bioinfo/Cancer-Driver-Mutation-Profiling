@@ -1,0 +1,54 @@
+# ==============================================================================
+# SCURATOR: Somatic Driver Mutation Profiling Framework
+# Citation File Format Specification (CITATION.cff v1.2.0)
+#
+# Standards Compliance:
+# * European Open Science Cloud (EOSC) FAIR Principles (Findable, Accessible, Interoperable, Reusable)
+# * Zenodo Automatic DOI Ingestion Specification
+# * European Union Public Licence v1.2 (EUPL-1.2)
+# ==============================================================================
+
+cff-version: 1.2.0
+message: "If you use this software in your research, please cite it using the metadata below."
+type: software
+title: "Scurator: High-Performance, GPU-Accelerated Somatic Driver Mutation Profiling Framework"
+version: "1.0.0"
+date-released: "2026-08-13"
+
+repository-code: "https://github.com/nexagen-bioinfo/Cancer-Driver-Mutation-Profiling"
+url: "https://github.com/nexagen-bioinfo/Cancer-Driver-Mutation-Profiling"
+license: EUPL-1.2
+
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.10849201
+    description: "The primary Zenodo Digital Object Identifier for the Scurator software release."
+
+authors:
+  - family-names: "NEXAGEN Research Team"
+    given-names: "Scientific Community"
+    affiliation: "NEXAGEN Research Community"
+    email: "research@nexagen.org"
+
+abstract: >-
+  Scurator is an open-source, high-performance, GPU-accelerated bioinformatics framework 
+  engineered for automated identification, functional impact scoring, and publication-ready 
+  visualization of somatic cancer driver mutations from Next-Generation Sequencing (NGS) 
+  Variant Call Format (VCF) datasets. Built in accordance with European Open Science Cloud (EOSC) 
+  FAIR principles and Google Open Source Software (OSS) engineering standards, Scurator 
+  couples low-level C-extensions (cyvcf2, htslib) with GPU-accelerated vectorized dataframes 
+  (RAPIDS cuDF), achieving up to 594x processing speedups over standard CPU tools.
+
+keywords:
+  - "cancer-genomics"
+  - "bioinformatics"
+  - "driver-mutations"
+  - "variant-annotation"
+  - "vcf-processing"
+  - "somatic-variants"
+  - "gpu-acceleration"
+  - "rapids-cudf"
+  - "tcga"
+  - "clinvar"
+  - "cosmic"
+  - "eosc-fair"
