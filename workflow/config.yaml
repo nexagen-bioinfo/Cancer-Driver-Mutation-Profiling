@@ -1,0 +1,81 @@
+# ==============================================================================
+# SCURATOR: Somatic Driver Mutation Profiling Framework
+# Pipeline and Workflow Configuration Specification (workflow/config.yaml)
+#
+# Standards Compliance:
+# * European Open Science Cloud (EOSC) FAIR Principles (Findable, Accessible, Interoperable, Reusable)
+# * Google Open Source Software (OSS) Engineering Practice Standards
+# * European Union Public Licence v1.2 (EUPL-1.2)
+# ==============================================================================
+
+pipeline:
+  name: "scurator_production"
+  version: "1.0.0"
+  enable_gpu: true
+  gpu_device_ids: [0, 1]
+  num_threads: 16
+  chunk_size: 50000
+  log_level: "INFO"
+
+directories:
+  raw_data_dir: "data/raw"
+  processed_data_dir: "data/processed"
+  external_db_dir: "data/external"
+  test_fixtures_dir: "data/test_fixtures"
+  output_figures_dir: "docs/figures"
+  logs_dir: "logs"
+
+quality_control:
+  min_read_depth: 10
+  min_qual_score: 30.0
+  min_variant_allele_frequency: 0.05
+  max_population_allele_frequency: 0.01
+  min_mapping_quality: 20
+  allowed_filter_status:
+    - "PASS"
+    - "."
+
+filtering_rules:
+  impact_types:
+    - "missense_variant"
+    - "frameshift_variant"
+    - "stop_gained"
+    - "splice_donor_variant"
+    - "splice_acceptor_variant"
+    - "inframe_insertion"
+    - "inframe_deletion"
+  target_genes_file: "config/driver_genes.json"
+  remove_synonymous: true
+  remove_intergenic: true
+
+annotation_and_scoring:
+  clinvar_db_path: "data/external/clinvar.vcf.gz"
+  cosmic_cgc_path: "data/external/cosmic_cancer_gene_census.csv"
+  weights:
+    clinvar_weight: 0.40
+    cosmic_weight: 0.30
+    damage_score_weight: 0.20
+    vaf_coverage_weight: 0.10
+  driver_confidence_threshold: 0.75
+
+visualization:
+  figure_dpi: 300
+  color_palette: "viridis"
+  export_formats:
+    - "png"
+    - "svg"
+    - "pdf"
+  oncoplot:
+    top_n_genes: 20
+    min_mutation_frequency: 0.02
+    show_sample_labels: true
+    annotation_legend: true
+  spectrum:
+    normalize: true
+    group_by_sample: false
+
+reporting:
+  generate_markdown_report: true
+  export_excel_summary: true
+  export_csv_summary: true
+  report_output_path: "docs/TECHNICAL_REPORT.md"
