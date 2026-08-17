@@ -1,0 +1,130 @@
+# ==============================================================================
+# SCURATOR: Somatic Driver Mutation Profiling Framework
+# Default Global Pipeline Configuration (config/default_config.yaml)
+#
+# Standards Compliance:
+# * European Open Science Cloud (EOSC) FAIR Principles (Findable, Accessible, Interoperable, Reusable)
+# * Google Open Source Software (OSS) Engineering Practice Standards
+# * European Union Public Licence v1.2 (EUPL-1.2)
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Pipeline Execution and Hardware Acceleration Settings
+# ------------------------------------------------------------------------------
+pipeline:
+  name: "scurator_default_pipeline"
+  version: "1.0.0"
+  enable_gpu: true
+  gpu_device_ids: [0, 1]
+  fallback_to_cpu: true
+  num_threads: 16
+  chunk_size: 50000
+  random_seed: 42
+  log_level: "INFO"
+
+# ------------------------------------------------------------------------------
+# 2. File System Path Hierarchies
+# ------------------------------------------------------------------------------
+paths:
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  external_dir: "data/external"
+  test_fixtures_dir: "data/test_fixtures"
+  output_figures_dir: "docs/figures"
+  logs_dir: "logs"
+
+# ------------------------------------------------------------------------------
+# 3. Sequencing Quality Control (QC) Filtering Thresholds
+# ------------------------------------------------------------------------------
+quality_control:
+  min_read_depth: 10
+  min_qual_score: 30.0
+  min_variant_allele_frequency: 0.05
+  max_population_allele_frequency: 0.01
+  min_mapping_quality: 20
+  allowed_filter_status:
+    - "PASS"
+    - "."
+
+# ------------------------------------------------------------------------------
+# 4. Somatic Variant Impact Classification Rules
+# ------------------------------------------------------------------------------
+variant_filtering:
+  impact_types:
+    - "missense_variant"
+    - "frameshift_variant"
+    - "stop_gained"
+    - "stop_lost"
+    - "splice_donor_variant"
+    - "splice_acceptor_variant"
+    - "inframe_insertion"
+    - "inframe_deletion"
+  target_genes_file: "config/driver_genes.json"
+  remove_synonymous: true
+  remove_intergenic: true
+  remove_intronic: true
+
+# ------------------------------------------------------------------------------
+# 5. External Database Annotation Sources
+# ------------------------------------------------------------------------------
+annotation:
+  clinvar:
+    enabled: true
+    vcf_path: "data/external/clinvar.vcf.gz"
+    pathogenic_terms:
+      - "Pathogenic"
+      - "Likely_pathogenic"
+      - "Pathogenic/Likely_pathogenic"
+    benign_terms:
+      - "Benign"
+      - "Likely_benign"
+  cosmic:
+    enabled: true
+    census_path: "data/external/cosmic_cancer_gene_census.csv"
+    tier_filter: [1, 2]
+  functional_predictors:
+    sift_threshold: 0.05
+    polyphen_threshold: 0.85
+    alphamissense_threshold: 0.564
+
+# ------------------------------------------------------------------------------
+# 6. Composite Driver Damage Index Scoring Matrix
+# Equation: S_driver = w1*ClinVar + w2*COSMIC + w3*Damage + w4*log10(VAF*DP)
+# ------------------------------------------------------------------------------
+scoring_matrix:
+  weights:
+    clinvar_weight: 0.40
+    cosmic_weight: 0.30
+    damage_score_weight: 0.20
+    vaf_coverage_weight: 0.10
+  driver_confidence_threshold: 0.75
+
+# ------------------------------------------------------------------------------
+# 7. Publication-Grade Graphics and Visualization Settings
+# ------------------------------------------------------------------------------
+visualization:
+  figure_dpi: 300
+  color_palette: "viridis"
+  export_formats:
+    - "png"
+    - "svg"
+    - "pdf"
+  oncoplot:
+    top_n_genes: 20
+    min_mutation_frequency: 0.02
+    show_sample_labels: true
+    annotation_legend: true
+    figure_dimensions: [12.0, 8.0]
+  spectrum:
+    normalize_frequencies: true
+    calculate_titv_ratio: true
+    figure_dimensions: [10.0, 6.0]
+
+# ------------------------------------------------------------------------------
+# 8. Report and Tabular Summary Output Settings
+# ------------------------------------------------------------------------------
+reporting:
+  generate_markdown_report: true
+  export_excel_summary: true
+  export_csv_summary: true
+  report_template_path: "docs/TECHNICAL_REPORT.md"
